@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <transaction-component></transaction-component>
 {{-- <example-component></example-component>
 <div class="container">
@@ -24,4 +25,5 @@
         </div>
     </div>
 </div> --}}
+
 @endsection

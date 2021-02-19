@@ -8,4 +8,7 @@ class Transaction extends Model
 {
     protected $table = 'transaction';
     protected $primaryKey = 'id';
+    protected $fillable = [
+        'user_id', 'amount', 'description'
+    ];
 }

@@ -1941,6 +1941,83 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2020,27 +2097,137 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      valid: true,
+      config: {
+        headers: {
+          Authorization: "Bearer " + window.Laravel.api_token,
+          Accept: "application/json"
+        }
+      },
+      total: 0,
       transaction: {
-        amount: 0,
+        amount: "",
         description: ""
       },
-      items: [{
-        color: "red lighten-2",
-        icon: "mdi-star"
-      }, {
-        color: "purple darken-1",
-        icon: "mdi-book-variant"
-      }, {
-        color: "green lighten-1",
-        icon: "mdi-airballoon"
-      }, {
-        color: "indigo",
-        icon: "mdi-buffer"
-      }]
+      doubleRules: [function (v) {
+        return !!v || "Este campo es requerido.";
+      }, function (v) {
+        return +v && v > 0 || "Deben ser valor mayor que 0.";
+      }],
+      snackbar: {
+        show: false,
+        message: "",
+        color: ""
+      },
+      items: []
     };
   },
   mounted: function mounted() {
-    console.log("Component mounted.");
+    this.setTransaction();
+  },
+  computed: {
+    positiveTransaction: function positiveTransaction() {
+      return this.items.filter(function (item) {
+        return item.amount >= 0;
+      });
+    },
+    negativeTransaction: function negativeTransaction() {
+      return this.items.filter(function (item) {
+        return item.amount < 0;
+      });
+    }
+  },
+  methods: {
+    setTransaction: function setTransaction() {
+      var _this = this;
+
+      axios.get("api/transaction", this.config).then(function (_ref) {
+        var data = _ref.data;
+        _this.total = data.total;
+        _this.items = data.records;
+      })["catch"](function (err) {
+        console.log(err);
+        _this.snackbar = {
+          show: true,
+          message: "Error inesperado al obtener los registros.",
+          color: "red"
+        };
+      });
+    },
+    storeTransaction: function storeTransaction(isNegative) {
+      var _this2 = this;
+
+      if (+this.transaction.amount && this.valid) {
+        var amount = this.transaction.amount;
+
+        if (isNegative) {
+          amount = amount * -1;
+        }
+
+        axios.post("api/transaction", _objectSpread(_objectSpread({}, this.transaction), {}, {
+          amount: amount
+        }), this.config).then(function (_ref2) {
+          var data = _ref2.data;
+          console.log(data.message);
+          _this2.snackbar = {
+            show: true,
+            message: data.message,
+            color: "indigo"
+          };
+
+          _this2.cleanForm();
+
+          _this2.setTransaction();
+        })["catch"](function (err) {
+          console.log(err);
+          _this2.snackbar = {
+            show: true,
+            message: "Error inesperado.",
+            color: "red"
+          };
+        });
+      } else {
+        this.snackbar = {
+          show: true,
+          message: "Debe completar el formulario.",
+          color: "red"
+        };
+      }
+    },
+    deleteTransaction: function deleteTransaction(_ref3) {
+      var _this3 = this;
+
+      var id = _ref3.id;
+      axios["delete"]("api/transaction", _objectSpread(_objectSpread({}, this.config), {}, {
+        params: {
+          id: id
+        }
+      })).then(function (_ref4) {
+        var data = _ref4.data;
+
+        _this3.setTransaction();
+
+        _this3.snackbar = {
+          show: true,
+          message: data.message,
+          color: "indigo"
+        };
+      })["catch"](function (err) {
+        console.log(err);
+        _this3.snackbar = {
+          show: true,
+          message: "Error inesperado.",
+          color: "red"
+        };
+      });
+    },
+    cleanForm: function cleanForm() {
+      this.$refs.form.reset();
+      this.transaction = {
+        amount: "",
+        description: ""
+      };
+    }
   }
 });
 
@@ -37719,80 +37906,118 @@ var render = function() {
                     "v-container",
                     { attrs: { fluid: "" } },
                     [
-                      _c(
-                        "v-row",
-                        [
-                          _c(
-                            "v-col",
-                            { attrs: { md: "4", cols: "12" } },
-                            [
-                              _c("v-text-field", {
-                                attrs: { label: "Monto", prefix: "$" },
-                                model: {
-                                  value: _vm.transaction.amount,
-                                  callback: function($$v) {
-                                    _vm.$set(_vm.transaction, "amount", $$v)
-                                  },
-                                  expression: "transaction.amount"
-                                }
-                              })
-                            ],
-                            1
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "v-col",
-                            [
-                              _c("v-text-field", {
-                                attrs: { label: "Descripción" },
-                                model: {
-                                  value: _vm.transaction.description,
-                                  callback: function($$v) {
-                                    _vm.$set(
-                                      _vm.transaction,
-                                      "description",
-                                      $$v
-                                    )
-                                  },
-                                  expression: "transaction.description"
-                                }
-                              })
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      ),
+                      _c("h1", { staticClass: "my-3" }, [_vm._v("😸 😺 🐒")]),
                       _vm._v(" "),
                       _c(
-                        "v-row",
+                        "v-form",
+                        {
+                          ref: "form",
+                          attrs: { "lazy-validation": "" },
+                          model: {
+                            value: _vm.valid,
+                            callback: function($$v) {
+                              _vm.valid = $$v
+                            },
+                            expression: "valid"
+                          }
+                        },
                         [
                           _c(
-                            "v-col",
+                            "v-row",
                             [
                               _c(
-                                "v-btn",
-                                {
-                                  staticClass: "mr-3",
-                                  attrs: { color: "error" }
-                                },
+                                "v-col",
+                                { attrs: { md: "4", cols: "12" } },
                                 [
-                                  _c("v-icon", { attrs: { dark: "" } }, [
-                                    _vm._v(" mdi-minus ")
-                                  ]),
-                                  _vm._v("Egreso\n              ")
+                                  _c("v-text-field", {
+                                    attrs: {
+                                      label: "Monto",
+                                      prefix: "$",
+                                      rules: _vm.doubleRules
+                                    },
+                                    model: {
+                                      value: _vm.transaction.amount,
+                                      callback: function($$v) {
+                                        _vm.$set(_vm.transaction, "amount", $$v)
+                                      },
+                                      expression: "transaction.amount"
+                                    }
+                                  })
                                 ],
                                 1
                               ),
                               _vm._v(" "),
                               _c(
-                                "v-btn",
-                                { attrs: { color: "teal darken-2", dark: "" } },
+                                "v-col",
                                 [
-                                  _c("v-icon", { attrs: { dark: "" } }, [
-                                    _vm._v(" mdi-plus ")
-                                  ]),
-                                  _vm._v("Ingreso\n              ")
+                                  _c("v-text-field", {
+                                    attrs: { label: "Descripción" },
+                                    model: {
+                                      value: _vm.transaction.description,
+                                      callback: function($$v) {
+                                        _vm.$set(
+                                          _vm.transaction,
+                                          "description",
+                                          $$v
+                                        )
+                                      },
+                                      expression: "transaction.description"
+                                    }
+                                  })
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-row",
+                            [
+                              _c(
+                                "v-col",
+                                [
+                                  _c(
+                                    "v-btn",
+                                    {
+                                      staticClass: "mr-3",
+                                      attrs: { color: "error" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.storeTransaction(true)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("v-icon", { attrs: { dark: "" } }, [
+                                        _vm._v(" mdi-minus ")
+                                      ]),
+                                      _vm._v("Egreso\n                ")
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-btn",
+                                    {
+                                      attrs: {
+                                        color: "teal darken-2",
+                                        dark: ""
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.storeTransaction(false)
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c("v-icon", { attrs: { dark: "" } }, [
+                                        _vm._v(" mdi-plus ")
+                                      ]),
+                                      _vm._v("Ingreso\n                ")
+                                    ],
+                                    1
+                                  )
                                 ],
                                 1
                               )
@@ -37817,19 +38042,41 @@ var render = function() {
                     { attrs: { fluid: "" } },
                     [
                       _c(
+                        "h1",
+                        {
+                          staticClass: "red--text",
+                          class: [
+                            _vm.total > 0
+                              ? "teal--text text--darken-1"
+                              : "deep-orange--text text--lighten-2"
+                          ]
+                        },
+                        [
+                          _vm._v(
+                            "\n            $ " +
+                              _vm._s(_vm.total) +
+                              "\n          "
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
                         "v-row",
                         [
                           _c(
                             "v-col",
-                            { attrs: { cols: "12", md: "8" } },
+                            { attrs: { cols: "12", md: "4" } },
                             [
                               _c(
                                 "v-timeline",
-                                { attrs: { "align-top": "" } },
-                                _vm._l(_vm.items, function(item, i) {
+                                { attrs: { "align-top": "", dense: "" } },
+                                _vm._l(_vm.items, function(item) {
                                   return _c(
                                     "v-timeline-item",
-                                    { key: i, attrs: { color: item.color } },
+                                    {
+                                      key: item.id,
+                                      attrs: { color: item.color }
+                                    },
                                     [
                                       _c(
                                         "v-card",
@@ -37842,7 +38089,9 @@ var render = function() {
                                             { staticClass: "title" },
                                             [
                                               _vm._v(
-                                                "\n                      Lorem Ipsum Dolor\n                    "
+                                                "\n                      " +
+                                                  _vm._s(item.created) +
+                                                  "\n                    "
                                               )
                                             ]
                                           ),
@@ -37853,12 +38102,14 @@ var render = function() {
                                               staticClass: "white text--primary"
                                             },
                                             [
-                                              _c("p", [_vm._v("monto")]),
-                                              _vm._v(" "),
-                                              _c("p", [
+                                              _c("h3", [
                                                 _vm._v(
-                                                  "\n                        Lorem ipsum dolor sit amet, no nam oblique veritus.\n                        Commune scaevola imperdiet nec ut, sed euismod\n                        convenire principes at. Est et nobis iisque percipit,\n                        an vim zril disputando voluptatibus, vix an salutandi\n                        sententiae.\n                      "
+                                                  "$ " + _vm._s(item.amount)
                                                 )
+                                              ]),
+                                              _vm._v(" "),
+                                              _c("h5", [
+                                                _vm._v(_vm._s(item.description))
                                               ]),
                                               _vm._v(" "),
                                               _c(
@@ -37868,6 +38119,13 @@ var render = function() {
                                                   attrs: {
                                                     color: item.color,
                                                     outlined: ""
+                                                  },
+                                                  on: {
+                                                    click: function($event) {
+                                                      return _vm.deleteTransaction(
+                                                        item
+                                                      )
+                                                    }
                                                   }
                                                 },
                                                 [
@@ -37893,6 +38151,140 @@ var render = function() {
                               )
                             ],
                             1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            [
+                              _c("h3", [_vm._v("Listado Egresos")]),
+                              _vm._v(" "),
+                              _vm.negativeTransaction.length > 0
+                                ? _c(
+                                    "v-card",
+                                    [
+                                      _c(
+                                        "v-list",
+                                        {
+                                          attrs: {
+                                            color: "blue-grey lighten-5"
+                                          }
+                                        },
+                                        [
+                                          _vm._l(
+                                            _vm.negativeTransaction,
+                                            function(item) {
+                                              return [
+                                                _c(
+                                                  "v-list-item",
+                                                  { key: item.id },
+                                                  [
+                                                    _c(
+                                                      "v-list-item-content",
+                                                      [
+                                                        _c(
+                                                          "v-list-item-title",
+                                                          [
+                                                            _vm._v(
+                                                              "\n                          $ " +
+                                                                _vm._s(
+                                                                  item.amount
+                                                                ) +
+                                                                "\n                          "
+                                                            ),
+                                                            _c("p", [
+                                                              _vm._v(
+                                                                _vm._s(
+                                                                  item.description
+                                                                )
+                                                              )
+                                                            ])
+                                                          ]
+                                                        )
+                                                      ],
+                                                      1
+                                                    )
+                                                  ],
+                                                  1
+                                                )
+                                              ]
+                                            }
+                                          )
+                                        ],
+                                        2
+                                      )
+                                    ],
+                                    1
+                                  )
+                                : _c("p", [_vm._v("Sin registro.")])
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            [
+                              _c("h3", [_vm._v("Listado ingresos")]),
+                              _vm._v(" "),
+                              _vm.positiveTransaction.length > 0
+                                ? _c(
+                                    "v-card",
+                                    [
+                                      _c(
+                                        "v-list",
+                                        {
+                                          attrs: {
+                                            color: "blue-grey lighten-5"
+                                          }
+                                        },
+                                        [
+                                          _vm._l(
+                                            _vm.positiveTransaction,
+                                            function(item) {
+                                              return [
+                                                _c(
+                                                  "v-list-item",
+                                                  { key: item.id },
+                                                  [
+                                                    _c(
+                                                      "v-list-item-content",
+                                                      [
+                                                        _c(
+                                                          "v-list-item-title",
+                                                          [
+                                                            _vm._v(
+                                                              "\n                          $ " +
+                                                                _vm._s(
+                                                                  item.amount
+                                                                ) +
+                                                                "\n                          "
+                                                            ),
+                                                            _c("p", [
+                                                              _vm._v(
+                                                                _vm._s(
+                                                                  item.description
+                                                                )
+                                                              )
+                                                            ])
+                                                          ]
+                                                        )
+                                                      ],
+                                                      1
+                                                    )
+                                                  ],
+                                                  1
+                                                )
+                                              ]
+                                            }
+                                          )
+                                        ],
+                                        2
+                                      )
+                                    ],
+                                    1
+                                  )
+                                : _c("p", [_vm._v("Sin registro.")])
+                            ],
+                            1
                           )
                         ],
                         1
@@ -37908,6 +38300,53 @@ var render = function() {
           )
         ],
         1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-snackbar",
+        {
+          attrs: {
+            timeout: "4500",
+            color: _vm.snackbar.color,
+            dark: "",
+            left: ""
+          },
+          scopedSlots: _vm._u([
+            {
+              key: "action",
+              fn: function(ref) {
+                var attrs = ref.attrs
+                return [
+                  _c(
+                    "v-btn",
+                    _vm._b(
+                      {
+                        attrs: { text: "" },
+                        on: {
+                          click: function($event) {
+                            _vm.snackbar.show = false
+                          }
+                        }
+                      },
+                      "v-btn",
+                      attrs,
+                      false
+                    ),
+                    [_vm._v("\n        Cerrar\n      ")]
+                  )
+                ]
+              }
+            }
+          ]),
+          model: {
+            value: _vm.snackbar.show,
+            callback: function($$v) {
+              _vm.$set(_vm.snackbar, "show", $$v)
+            },
+            expression: "snackbar.show"
+          }
+        },
+        [_vm._v("\n    " + _vm._s(_vm.snackbar.message) + "\n    ")]
       )
     ],
     1
