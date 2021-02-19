@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-container class="mt-4">
-      <v-tabs color="indigo">
+      <v-tabs color="indigo" show-arrows>
         <v-tab>Agregar Transacción</v-tab>
         <v-tab>Registro de Transacciones</v-tab>
         <v-tab-item>
@@ -106,7 +106,7 @@
                 <p v-else>Sin registro.</p>
               </v-col>
               <v-col>
-                <h3>Listado ingresos</h3>
+                <h3>Listado Ingresos</h3>
                 <v-card v-if="positiveTransaction.length > 0">
                   <v-list color="blue-grey lighten-5">
                     <template v-for="item in positiveTransaction">
